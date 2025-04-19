@@ -228,7 +228,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
     });
 
     // TODO: Fix flakiness when intercepting environment requests
-    test.skip('clerk-js environment fails and status degraded', async ({ page, context }) => {
+    test('clerk-js environment fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));
