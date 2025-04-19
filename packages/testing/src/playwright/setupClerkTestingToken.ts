@@ -28,8 +28,15 @@ type SetupClerkTestingTokenParams = {
  *  });
  */
 export const setupClerkTestingToken = async ({ context, options, page }: SetupClerkTestingTokenParams) => {
-  if (!context) {
-    context = page?.context();
+  if (!context && !page) {
+    throw new Error('Either context or page must be provided');
+  }
+
+  if (!context && page) {
+    context = page.context();
+    if (!context) {
+      throw new Error('Could not get context from page. Make sure the page is properly initialized.');
+    }
   }
 
   if (!context) {
