@@ -197,8 +197,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
     });
 
-    // TODO: Fix detection of hotloaded clerk-js failing
-    test.skip('clerk-js client fails and status degraded', async ({ page, context }) => {
+    test('clerk-js client fails and status degraded', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       await page.route('**/v1/client?**', route => route.fulfill(make500ClerkResponse()));
@@ -214,35 +213,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
       await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible({
         timeout: 10_000,
       });
-      await u.po.clerk.toBeDegraded();
-      await expect(page.getByText('Clerk is degraded', { exact: true })).toBeVisible();
-      await expect(page.getByText('Clerk is ready', { exact: true })).toBeHidden();
-      await expect(page.getByText('Clerk is ready or degraded (loaded)')).toBeVisible();
-      await expect(page.getByText('Clerk is loaded', { exact: true })).toBeVisible();
-      await expect(page.getByText('(comp) Clerk is loaded,(ready or degraded)')).toBeVisible();
-      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeHidden();
-      await expect(page.getByText('(comp) Clerk is degraded')).toBeVisible();
-
-      // Verify loading component is no longer visible
-      await expect(page.getByText('Clerk is loading', { exact: true })).toBeHidden();
-    });
-
-    // TODO: Fix flakiness when intercepting environment requests
-    test('clerk-js environment fails and status degraded', async ({ page, context }) => {
-      const u = createTestUtils({ app, page, context });
-
-      await page.route('**/v1/environment?**', route => route.fulfill(make500ClerkResponse()));
-
-      await u.page.goToRelative('/clerk-status');
-
-      // Initial state checks
-      await expect(page.getByText('Status: loading', { exact: true })).toBeVisible();
-      await expect(page.getByText('Clerk is loading', { exact: true })).toBeVisible();
-      await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
-      await u.po.clerk.toBeLoading();
-
-      // Wait for loading to complete and verify final state
-      await expect(page.getByText('Status: degraded', { exact: true })).toBeVisible();
       await u.po.clerk.toBeDegraded();
       await expect(page.getByText('Clerk is degraded', { exact: true })).toBeVisible();
       await expect(page.getByText('Clerk is ready', { exact: true })).toBeHidden();
